@@ -17,6 +17,6 @@ npm install
 
 ## Scripts
 ```bash
- # Compile TypeScript and run app.js
+# Compile TypeScript and run app.js
 npm start 
 ```
