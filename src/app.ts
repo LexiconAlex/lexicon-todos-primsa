@@ -1,6 +1,8 @@
 import PromptSync from "prompt-sync";
+import { PrismaClient } from "@prisma/client";
 
 const input = PromptSync();
+const prisma = new PrismaClient();
 
 async function main() {
   while (true) {
@@ -12,12 +14,15 @@ async function main() {
       const option = input("Option: ");
       switch (option) {
         case "1":
+          await addTodo();
           input("Press enter to continue...");
           break;
         case "2":
+          await completeTodo();
           input("Press enter to continue...");
           break;
         case "3":
+          await listTodos();
           input("Press enter to continue...");
           break;
         case "4":
@@ -35,3 +40,30 @@ async function main() {
 }
 
 main();
+
+async function addTodo() {
+  const title = input("Name your todo: ");
+  await prisma.todos.create({
+    data: { title },
+  });
+}
+
+async function completeTodo() {
+  const id = parseInt(input("Enter your todo ID: "));
+  await prisma.todos.update({
+    where: { id },
+    data: { completedAt: new Date() },
+  });
+}
+
+async function listTodos() {
+  const todos = await prisma.todos.findMany();
+  todos.map((todo) =>
+    console.log(`ID: ${todo.id} - ${todo.title} 
+    ${
+      !todo.completedAt
+        ? `[] - Created at ${todo.createdAt.toLocaleDateString()}`
+        : `[X] - Complete at ${todo.completedAt.toLocaleDateString()}`
+    }`)
+  );
+}
